@@ -13,6 +13,7 @@ namespace Graphs1
     public partial class Form1 : Form
     {
         List<Edge> Edges = new List<Edge>();
+        Form newForm;
 
         public Form1()
         {
@@ -22,7 +23,7 @@ namespace Graphs1
         private void button1_Click(object sender, EventArgs e)
         {
             AddEdgesToList();
-            EraseFormControls();
+            CreateNewForm();
             DrawGraph();
         }
 
@@ -38,33 +39,16 @@ namespace Graphs1
                         tbToEdit.Text = "0";
                         tbToEdit.ReadOnly = true;
                     }
-                    tbToEdit.TextChanged += new EventHandler(TextBox_TextChanged);
                 }
             }
         }
 
-        private void TextBox_TextChanged(object sender, EventArgs e)
+        private void CreateNewForm()
         {
-            TextBox changedTb = (TextBox)sender;
-            if (changedTb.Text == "1")
-            {
-                TableLayoutPanelCellPosition position = tableLayoutPanel1.GetPositionFromControl(changedTb);
-
-                int ogColumn = position.Column;
-                int ogRow = position.Row;
-
-                TextBox tbToEdit = tableLayoutPanel1.GetControlFromPosition(ogRow, ogColumn) as TextBox;
-                tbToEdit.Text = "0";
-            }
-
-        }
-
-        private void EraseFormControls()
-        {
-            for (int i = this.Controls.Count - 1; i >= 0; i--)
-            {
-                this.Controls.RemoveAt(i);
-            }
+            Form Form2 = new Form();
+            Form2.Size = new Size(500, 500);
+            newForm = Form2;
+            newForm.Show();
         }
 
         private void AddEdgesToList()
@@ -87,7 +71,7 @@ namespace Graphs1
 
         private void DrawGraph()
         {
-            Graphics graphics = this.CreateGraphics();
+            Graphics graphics = newForm.CreateGraphics();
             int numberOfVertices = CalculateNumberOfVertices();
 
             PointF[] vertices = new PointF[numberOfVertices];
