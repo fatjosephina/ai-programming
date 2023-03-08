@@ -32,7 +32,7 @@ namespace PermutationsAndCounting
             return charArray;
         }
 
-        // This code formats the results and calls the CalculatePermutations method which calculates nPr and the Permute method which displays all the permutations
+        // This code formats the results and calls the CalculatePermutations method which calculates nPr and the Arrange method which displays all the permutations
         static void DisplayPermutations(char[] charArray)
         {
             Console.WriteLine("~~Permutations~~");
@@ -45,7 +45,6 @@ namespace PermutationsAndCounting
                 Arrange(charArray, i, "permutation");
                 Console.WriteLine("}");
             }
-
         }
 
         static void DisplayOrderedPartitions(char[] charArray)
@@ -74,6 +73,8 @@ namespace PermutationsAndCounting
 
         // Value array created here is where we will store our permutation
         // Used already array will keep track of which characters have already been added to the value array
+        // The HashList keeps track of all the arrangements already created, which is necessary for ordered partitions and combinations
+        // Combinations also need an additional value index array which keeps track of the original indices (in the charArray) of the characters added to the value array
         static void Arrange(char[] charArray, int sample, string arrangementType)
         {
             char[] value = new char[sample];
@@ -92,7 +93,8 @@ namespace PermutationsAndCounting
             else if (arrangementType == "combination")
             {
                 HashSet<string> previousArrangements = new HashSet<string>();
-                Combine(charArray, value, usedAlready, 0, sample, previousArrangements);
+                int[] valueIndices = new int[sample];
+                Combine(charArray, value, usedAlready, valueIndices, 0, sample, previousArrangements);
             }
 
         }
@@ -163,20 +165,28 @@ namespace PermutationsAndCounting
         }
 
         // We have a bit more logic for the combine helper version, including a method which calculates if a hash set contains all the same characters as a string
-        static void Combine(char[] charArray, char[] value, bool[] usedAlready, int index, int sample, HashSet<string> previousCombinations)
+        static void Combine(char[] charArray, char[] value, bool[] usedAlready, int[] valueIndices, int index, int sample, HashSet<string> previousCombinations)
         {
             // If this statement is true, then we have formed a complete permutation of r characters and can print it to the console
             if (index == sample)
             {
                 string combination = new string(value);
 
+                // This makes the string that we're going to use which combinations have previously been created
+                // The reason why we care about indices here and not during ordered partitions is because we want to display all combinations even if they are visually identical to previous ones
+                string combinationIndices = "";
+                foreach (int j in valueIndices)
+                {
+                    combinationIndices += j;
+                }
+
                 // If the combination has already been written, we won't write it
-                if (!HashSetContainsSameCharacters(previousCombinations, combination))
+                if (!HashSetContainsSameCharacters(previousCombinations, combinationIndices))
                 {
                     Console.Write(combination + " ");
 
                     // Add it to the hash set
-                    previousCombinations.Add(combination);
+                    previousCombinations.Add(combinationIndices);
                 }
                 return;
             }
@@ -189,10 +199,11 @@ namespace PermutationsAndCounting
                 if (!usedAlready[i] && sample - index <= charArray.Length - i)
                 {
                     value[index] = charArray[i];
+                    valueIndices[index] = i;
                     // Used already makes sure we don't use the same character from the original array twice
                     usedAlready[i] = true;
                     // Call the function recursively, all values have changed except for charArray and sample
-                    Combine(charArray, value, usedAlready, index + 1, sample, previousCombinations);
+                    Combine(charArray, value, usedAlready, valueIndices, index + 1, sample, previousCombinations);
                     // Set used already back to false so we can use the same character again in the next permutation
                     usedAlready[i] = false;
                 }
