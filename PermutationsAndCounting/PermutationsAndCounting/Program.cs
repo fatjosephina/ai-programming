@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
 
 namespace PermutationsAndCounting
 {
@@ -64,7 +63,7 @@ namespace PermutationsAndCounting
             Console.WriteLine("~~Combinations~~");
             for (int i = 1; i <= 5; i++)
             {
-                Console.WriteLine("-5P" + i + "-");
+                Console.WriteLine("-5C" + i + "-");
                 int count = CalculateCombinations(5, i);
                 Console.WriteLine("Count = " + count);
                 Console.Write("S = { ");
@@ -198,6 +197,7 @@ namespace PermutationsAndCounting
             for (int i = index; i < charArray.Length; i++)
             {
                 // If the bool variable at the corresponding place has not been used already, we add to the value array starting from the start position
+                // Also check if we have enough characters left to form a combination of the correct length
                 if (!usedAlready[i] && sample - index <= charArray.Length - i)
                 {
                     value[index] = charArray[i];
