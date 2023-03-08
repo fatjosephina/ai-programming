@@ -42,7 +42,7 @@ namespace PermutationsAndCounting
                 int count = CalculatePermutations(5, i);
                 Console.WriteLine("Count = " + count);
                 Console.Write("S = { ");
-                Permute(charArray, i);
+                Arrange(charArray, i, "permutation");
                 Console.WriteLine("}");
             }
 
@@ -54,7 +54,7 @@ namespace PermutationsAndCounting
             int count = CalculateOrderedPartitions(5, charArray);
             Console.WriteLine("Count = " + count);
             Console.Write("S = { ");
-            OrderPartition(charArray);
+            Arrange(charArray, 5, "orderedPartition");
             Console.WriteLine("}");
         }
 
@@ -67,24 +67,38 @@ namespace PermutationsAndCounting
                 int count = CalculateCombinations(5, i);
                 Console.WriteLine("Count = " + count);
                 Console.Write("S = { ");
-                Combine(charArray, i);
+                Arrange(charArray, i, "combination");
                 Console.WriteLine("}");
             }
         }
 
         // Value array created here is where we will store our permutation
         // Used already array will keep track of which characters have already been added to the value array
-        static void Permute(char[] charArray, int sample)
+        static void Arrange(char[] charArray, int sample, string arrangementType)
         {
             char[] value = new char[sample];
             bool[] usedAlready = new bool[charArray.Length];
-            
+
             // Call the recursive function
-            PermuteHelper(charArray, value, usedAlready, 0, sample);
+            if (arrangementType == "permutation")
+            {
+                Permute(charArray, value, usedAlready, 0, sample);
+            }
+            else if (arrangementType == "orderedPartition")
+            {
+                HashSet<string> previousArrangements = new HashSet<string>();
+                OrderPartition(charArray, value, usedAlready, 0, 5, previousArrangements);
+            }
+            else if (arrangementType == "combination")
+            {
+                HashSet<string> previousArrangements = new HashSet<string>();
+                Combine(charArray, value, usedAlready, 0, sample, previousArrangements);
+            }
+
         }
 
         // This function writes the permutation to the console and exits when it has created one, otherwise it will continue adding characters to the value string
-        static void PermuteHelper(char[] charArray, char[] value, bool[] usedAlready, int index, int sample)
+        static void Permute(char[] charArray, char[] value, bool[] usedAlready, int index, int sample)
         {
             // If this statement is true, then we have formed a complete permutation of r characters and can print it to the console
             if (index == sample)
@@ -104,28 +118,15 @@ namespace PermutationsAndCounting
                     // Used already makes sure we don't use the same character from the original array twice
                     usedAlready[i] = true;
                     // Call the function recursively, all values have changed except for charArray and sample
-                    PermuteHelper(charArray, value, usedAlready, index + 1, sample);
+                    Permute(charArray, value, usedAlready, index + 1, sample);
                     // Set used already back to false so we can use the same character again in the next permutation
                     usedAlready[i] = false;
                 }
             }
         }
 
-        // Similar to calculating permutations except we need to keep track of what strings we have already used
-        static void OrderPartition(char[] charArray)
-        {
-            char[] value = new char[5];
-            bool[] usedAlready = new bool[charArray.Length];
-
-            // We can use a HashSet to keep track of all the permutations already created, a List would be acceptable here too
-            HashSet<string> previousPermutations = new HashSet<string>();
-
-            // Call the recursive function
-            OrderPartitionHelper(charArray, value, usedAlready, 0, 5, previousPermutations);
-        }
-
         // Similar to the recursive function for permutations but this time we keep track
-        static void OrderPartitionHelper(char[] charArray, char[] value, bool[] usedAlready, int index, int sample, HashSet<string> previousPermutations)
+        static void OrderPartition(char[] charArray, char[] value, bool[] usedAlready, int index, int sample, HashSet<string> previousPermutations)
         {
             // If this statement is true, then we have formed a complete permutation of r characters and can print it to the console
             if (index == sample)
@@ -154,28 +155,15 @@ namespace PermutationsAndCounting
                     // Used already makes sure we don't use the same character from the original array twice
                     usedAlready[i] = true;
                     // Call the function recursively, all values have changed except for charArray and sample
-                    OrderPartitionHelper(charArray, value, usedAlready, index + 1, sample, previousPermutations);
+                    OrderPartition(charArray, value, usedAlready, index + 1, sample, previousPermutations);
                     // Set used already back to false so we can use the same character again in the next permutation
                     usedAlready[i] = false;
                 }
             }
         }
 
-        // Similar to permutation and ordered partition, we are using a hash set to keep track again
-        static void Combine(char[] charArray, int sample)
-        {
-            char[] value = new char[sample];
-            bool[] usedAlready = new bool[charArray.Length];
-
-            // We can use a HashSet to keep track of all the permutations already created, a List would be acceptable here too
-            HashSet<string> previousCombinations = new HashSet<string>();
-
-            // Call the recursive function
-            CombineHelper(charArray, value, usedAlready, 0, sample, previousCombinations);
-        }
-
         // We have a bit more logic for the combine helper version, including a method which calculates if a hash set contains all the same characters as a string
-        static void CombineHelper(char[] charArray, char[] value, bool[] usedAlready, int index, int sample, HashSet<string> previousCombinations)
+        static void Combine(char[] charArray, char[] value, bool[] usedAlready, int index, int sample, HashSet<string> previousCombinations)
         {
             // If this statement is true, then we have formed a complete permutation of r characters and can print it to the console
             if (index == sample)
@@ -204,7 +192,7 @@ namespace PermutationsAndCounting
                     // Used already makes sure we don't use the same character from the original array twice
                     usedAlready[i] = true;
                     // Call the function recursively, all values have changed except for charArray and sample
-                    CombineHelper(charArray, value, usedAlready, index + 1, sample, previousCombinations);
+                    Combine(charArray, value, usedAlready, index + 1, sample, previousCombinations);
                     // Set used already back to false so we can use the same character again in the next permutation
                     usedAlready[i] = false;
                 }
