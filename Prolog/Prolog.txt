@@ -1,0 +1,79 @@
+:- use_module(library(clpb)).
+
+parent(greatGrandmother1, grandmother).
+parent(greatGrandfather1, grandmother).
+parent(greatGrandmother2, grandfather).
+parent(greatGrandfather2, grandfather).
+parent(grandmother, father).
+parent(grandmother, uncle1).
+parent(grandmother, aunt).
+parent(grandfather, father).
+parent(grandfather, uncle1).
+parent(grandfather, aunt).
+parent(mother, brother).
+parent(mother, twinSister).
+parent(mother, me).
+parent(father, brother).
+parent(father, twinSister).
+parent(father, me).
+parent(me, daughter).
+parent(me, son).
+parent(husband, daughter).
+parent(husband, son).
+parent(aunt, cousin1).
+parent(aunt, cousin2).
+parent(uncle2, cousin1).
+parent(uncle2, cousin2).
+parent(cousinsWife, niece).
+parent(cousinsWife, nephew).
+parent(cousin1, niece).
+parent(cousin1, nephew).
+
+gender(greatGrandfather1, male).
+gender(greatGrandfather2, male).
+gender(grandfather, male).
+gender(father, male).
+gender(uncle1, male).
+gender(brother, male).
+gender(husband, male).
+gender(son, male).
+gender(uncle2, male).
+gender(cousin1, male).
+gender(nephew, male).
+gender(greatGrandmother1, female).
+gender(greatGrandmother2, female).
+gender(grandmother, female).
+gender(mother, female).
+gender(aunt, female).
+gender(twinSister, female).
+gender(me, female).
+gender(daughter, female).
+gender(cousin2, female).
+gender(cousinsWife, female).
+gender(niece, female).
+
+male(X) :- gender(X, male).
+female(X) :- gender(X, female).
+isMarriedDuplicates(X, Y) :- parent(X, Z), parent(Y, Z), X \== Y.
+isMarried(X, Y) :- 
+    setof(i, isMarriedDuplicates(X, Y), _).
+siblingDuplicates(X, Y) :- parent(Z, X), parent(Z, Y), X \== Y.
+sibling(X, Y) :- 
+    setof(i, siblingDuplicates(X, Y), _).
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y).
+greatGrandparent(X, Y) :- parent(X, Z), grandparent(Z, Y).
+bloodAuntOrUncleDuplicates(X, Z) :- sibling(X, Y), parent(Y, Z).
+bloodAuntOrUncle(X, Z) :- 
+    setof(i, bloodAuntOrUncleDuplicates(X, Z), _).
+nonBloodAuntOrUncleDuplicates(X, Z):- isMarried(X, Y), bloodAuntOrUncle(Y, Z).
+nonBloodAuntOrUncle(X, Z) :- 
+    setof(i, nonBloodAuntOrUncleDuplicates(X, Z), _).
+auntOrUncle(X, Z) :- bloodAuntOrUncle(X, Z).
+auntOrUncle(X, Z) :- nonBloodAuntOrUncle(X, Z).
+isChild(X, Y) :- parent(Y, X).
+son(X, Y) :- isChild(X, Y), male(X).
+daughter(X, Y) :- isChild(X, Y), female(X).
+cousinNephewDuplicates(X, Y) :- auntOrUncle(Z, Y), grandparent(Z, X), male(X).
+nephew(X, Y) :- auntOrUncle(Y, X), male(X).
+nephew(X, Y) :- 
+    setof(i, cousinNephewDuplicates(X, Y), _).
